@@ -62,20 +62,20 @@ def GetScreenshotSizes():
  
 def getPluginInfo():
     pluginInfo = {}
-    pluginInfo['name'] = 'SNH user script - dummy '
-    pluginInfo['url'] = 'https://url.com/'
+    pluginInfo['name'] = 'SNH user script - Gettr '
+    pluginInfo['url'] = 'https://gettr.com/'
     pluginInfo['copyright'] = 'Freezingdata GmbH'
     pluginInfo['functions'] = {}
     pluginInfo['functions']['profile'] = True
     pluginInfo['functions']['groups'] = False
-    pluginInfo['functions']['details'] = False
+    pluginInfo['functions']['details'] = True
     pluginInfo['functions']['stories'] = False
-    pluginInfo['functions']['videos'] = False
-    pluginInfo['functions']['friends'] = False
-    pluginInfo['functions']['follower'] = False
-    pluginInfo['functions']['timeline'] = False
+    pluginInfo['functions']['videos'] = True
+    pluginInfo['functions']['friends'] = True
+    pluginInfo['functions']['follower'] = True
+    pluginInfo['functions']['timeline'] = True
     pluginInfo['functions']['timelinereactions'] = False
-    pluginInfo['functions']['timelinecomments'] = False
+    pluginInfo['functions']['timelinecomments'] = True
     pluginInfo['functions']['media'] = False
     pluginInfo['functions']['mediareactions'] = False
     pluginInfo['functions']['mediacomments'] = False

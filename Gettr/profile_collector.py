@@ -54,4 +54,9 @@ class ProfileCollector:
         
     def save_profile_details(self, profile):
         debugPrint('[START] Python Script: SaveProfileDetails')
+        self.api.load_page(GetURL_Profile(profile["UserID"]))
+        gettr_data_unif = self.api.get_unif(profile["UserID"])
+        detail_list = GettrDataObject(gettr_data_unif).as_SNUserdetailsItem_list()
+        for detail_item in detail_list:
+            snhwalker.PromoteSNUserdetailsItem(detail_item)          
         debugPrint('[Finished] Python Script: SaveProfileDetails')

@@ -113,6 +113,28 @@ class GettrDataObject:
             debugPrint(f'API DataObject -> as_SNUserData: No uinf data object')  
         return ProfileData
 
+    def as_SNUserdetailsItem_list(self):
+        return_list = []
+        if not self.is_uinf() is True:
+            return []
+        unif_data = self.data["result"]["data"]
+        if "location" in unif_data:
+            DetailLocation = snhwalker_utils.snh_model_manager.CreateDictSNUserdetailsItem()
+            DetailLocation['DetailType'] = 'CurrentCity'        
+            DetailLocation['DetailMainContent'] = unif_data["location"]
+            return_list.append(DetailLocation)
+        if "dsc" in unif_data:
+            DetailDsc = snhwalker_utils.snh_model_manager.CreateDictSNUserdetailsItem()
+            DetailDsc['DetailType'] = 'Description'        
+            DetailDsc['DetailMainContent'] = unif_data["dsc"]
+            return_list.append(DetailDsc)     
+        if "website" in unif_data:
+            DetailWeb = snhwalker_utils.snh_model_manager.CreateDictSNUserdetailsItem()
+            DetailWeb['DetailType'] = 'Website'        
+            DetailWeb['DetailMainContent'] = unif_data["website"]
+            return_list.append(DetailWeb)       
+        return return_list              
+
     def as_SNChatmessage_list(self):
         return_list = []
         try:
