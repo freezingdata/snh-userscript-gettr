@@ -25,7 +25,18 @@ class ProfileCollector:
         pass
 
     def handle_current_profile(self):
-        pass
+        ProfileData = snhwalker_utils.snh_model_manager.CreateDictSNUserData()
+ 
+        ProfileData['ProfileType'] = 0
+        ProfileData['UserIDNumber'] = snhwalker_utils.snh_browser.GetJavascriptString('document.querySelector("meta[property*=url]").getAttribute("content").replace("https://www.gettr.com/user/","")')
+        ProfileData['UserID'] = ProfileData['UserIDNumber'] 
+        ProfileData['UserURL'] = GetURL_Profile(ProfileData['UserID'], ProfileData['UserIDNumber'])
+
+        ProfileData['UserName'] = snhwalker_utils.snh_browser.GetJavascriptString('document.querySelector("meta[property*=title]").getAttribute("content").replace(" on GETTR","")')
+        ProfileData['UserProfilePictureURL'] = snhwalker_utils.snh_browser.GetJavascriptString('document.querySelector("meta[property*=image]").getAttribute("content")')
+        debugPrint("[Profile] Handle Profile", ProfileData)
+        snhwalker.PromoteSNUserdata(ProfileData)        
+        
 
     def handle_current_group(self):
         pass    

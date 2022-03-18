@@ -32,13 +32,34 @@ class GattrAPI:
     def load_page(self, url):
         snhwalker_utils.snh_browser.StartResourceCapture('https://api.gettr.com/', '')
         snhwalker_utils.snh_browser.LoadPage(url)
-        snhwalker_utils.snh_browser.StopResourceCapture() 
-        last_request_header = snhwalker_utils.snh_browser.GetResourceHeader()
-        debugPrint(f'[API]  Resource header -> {last_request_header}')
-        self.x_app_auth = getRegex(last_request_header, 'x-app-auth=(\{.*?\})', 1)
-        self.version = getRegex(last_request_header, ';ver=(.*?);', 1)
-        self.useragent = getRegex(last_request_header, ';User-Agent=(.*?);[^;]+?\=', 1)
+        api_calls = snhwalker_utils.snh_browser.CloseResourceCapture() 
+
+        if len(api_calls) == 0:
+            debugPrint(f'[API]  Capture failed')    
+            return
+        
+        sample_api_call = api_calls[0]
+        debugPrint(f'[API]  Sample API Call -> {sample_api_call}')
+        
+        if not 'x-app-auth' in  sample_api_call["request_header"]:
+            debugPrint(f'[API]  "x-app-auth" missing in captured request header')
+            return
+        self.x_app_auth = sample_api_call["request_header"]["x-app-auth"]
+
+        if not 'ver' in  sample_api_call["request_header"]:
+            debugPrint(f'[API]  "ver" missing in captured request header')
+            return
+        self.version = sample_api_call["request_header"]["ver"]
+
+
+        if not 'User-Agent' in  sample_api_call["request_header"]:
+            debugPrint(f'[API]  "User-Agent" missing in captured request header')
+            return
+        self.useragent = sample_api_call["request_header"]["User-Agent"]        
+
         debugPrint(f'[API]  x_app_auth -> {self.x_app_auth}')
+        debugPrint(f'[API]  ver -> {self.version}')
+        debugPrint(f'[API]  User-Agent -> {self.useragent}')
 
 
     def get_unif(self, user_id):
