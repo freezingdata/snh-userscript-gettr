@@ -39,7 +39,7 @@ class GattrAPI:
             return
         
         sample_api_call = api_calls[0]
-        debugPrint(f'[API]  Sample API Call -> {sample_api_call}')
+        debugPrint(f'[API]  Sample API Call -> {sample_api_call["url"]}')
         
         if not 'x-app-auth' in  sample_api_call["request_header"]:
             debugPrint(f'[API]  "x-app-auth" missing in captured request header')
