@@ -158,7 +158,7 @@ class GettrDataObject:
                     chat_message["VideoURL"] = "https://media.gettr.com/" + post_data["ovid"]  
 
                 if list_item["action"] == "pub_pst":
-                    chat_message["Timestamp"] = post_data["cdate"]   
+                    chat_message["Timestamp"] = post_data["cdate"] / 1000  
                     chat_message["UniqueIDNetwork"] = post_data["_id"]
                     chat_message["ChatParentID"] = "-1"
                     chat_message["SenderUser"] = self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][list_item["activity"]["uid"]])  
@@ -166,7 +166,7 @@ class GettrDataObject:
                     
                 elif list_item["action"] == "shares_pst":
                     # 1. add repost to list
-                    chat_message["Timestamp"] = list_item["activity"]["cdate"]   
+                    chat_message["Timestamp"] = list_item["activity"]["cdate"] / 1000    
                     chat_message["UniqueIDNetwork"] = list_item["activity"]["_id"]
                     chat_message["ChatParentID"] = post_id
                     chat_message["SenderUser"] =  self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][post_data["uid"]])  
@@ -175,7 +175,7 @@ class GettrDataObject:
 
                     # 2. add original post to list
                     chat_message_original = chat_message.copy()
-                    chat_message_original["Timestamp"] = post_data["cdate"]   
+                    chat_message_original["Timestamp"] = post_data["cdate"] / 1000  
                     chat_message_original["UniqueIDNetwork"] = post_id
                     chat_message_original["ChatParentID"] = "-1"
                     chat_message_original["SenderUser"] = self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][post_data["uid"]])  
@@ -185,7 +185,7 @@ class GettrDataObject:
 
                 elif list_item["action"] == "pub_cm":
                     # 1. add comment post to list
-                    chat_message["Timestamp"] = list_item["activity"]["cdate"]   
+                    chat_message["Timestamp"] = list_item["activity"]["cdate"] / 1000  
                     chat_message["UniqueIDNetwork"] = post_id
                     chat_message["ChatParentID"] = post_data["pid"]
                     chat_message["SenderUser"] =  self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][post_data["uid"]])  
@@ -205,7 +205,7 @@ class GettrDataObject:
                         chat_message_original["ImageURL"] = "https://media.gettr.com/" + original_post["previmg"]               
                     if ('ovid' in original_post):            
                         chat_message_original["VideoURL"] = "https://media.gettr.com/" + original_post["ovid"]                      
-                    chat_message_original["Timestamp"] = original_post["cdate"]   
+                    chat_message_original["Timestamp"] = original_post["cdate"]  / 1000    
                     chat_message_original["UniqueIDNetwork"] = post_data["pid"]
                     chat_message_original["ChatParentID"] = "-1"
                     chat_message_original["SenderUser"] = self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][original_post["uid"]])  
