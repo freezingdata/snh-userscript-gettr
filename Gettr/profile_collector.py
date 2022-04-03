@@ -25,6 +25,11 @@ class ProfileCollector:
         pass
 
     def handle_current_profile(self):
+        current_url = snhwalker_utils.snh_browser.GetJavascriptString('window.location.href')
+        if not 'https://www.gettr.com/user/' in current_url:
+            debugPrint('[Profile] Current page isn\'t a user profile')
+            return
+
         ProfileData = snhwalker_utils.snh_model_manager.CreateDictSNUserData()
  
         ProfileData['ProfileType'] = 0
