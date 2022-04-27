@@ -17,6 +17,14 @@ from snhwalker_utils import snhwalker, snh_major_version
 import snhwalker_utils   
 import json
 import sys
+from urllib.parse import urlparse
+
+def uri_validator(x):
+    try:
+        result = urlparse(x)
+        return all([result.scheme, result.netloc])
+    except:
+        return False
 
 class GettrDataObject:
     def __init__(self, json_string) -> None:
@@ -150,12 +158,26 @@ class GettrDataObject:
                     chat_message["Text"] = post_data["txt"]                                    
                 if "prevsrc" in post_data:
                     chat_message["LinkURL"] = post_data["prevsrc"]
-                if ('img' in post_data) and (len(post_data["img"]) > 0):            
-                    chat_message["ImageURL"] = "https://media.gettr.com/" + post_data["img"][0]
+                if ('img' in post_data) and (len(post_data["img"]) > 0):    #deprecated?  
+                    if uri_validator(post_data["img"][0]) is False:
+                        chat_message["ImageURL"] = "https://media.gettr.com/" + post_data["img"][0]  
+                    else:
+                        chat_message["ImageURL"] = post_data["img"][0]                           
+                if ('imgs' in post_data) and (len(post_data["imgs"]) > 0):    
+                    if uri_validator(post_data["imgs"][0]) is False:
+                        chat_message["ImageURL"] = "https://media.gettr.com/" + post_data["imgs"][0]  
+                    else:
+                        chat_message["ImageURL"] = post_data["imgs"][0]                       
                 if ('previmg' in post_data) :            
-                    chat_message["ImageURL"] = "https://media.gettr.com/" + post_data["previmg"]               
+                    if uri_validator(post_data["previmg"]) is False:
+                        chat_message["ImageURL"] = "https://media.gettr.com/" + post_data["previmg"] 
+                    else:
+                        chat_message["ImageURL"] = post_data["previmg"]                                  
                 if ('ovid' in post_data):            
-                    chat_message["VideoURL"] = "https://media.gettr.com/" + post_data["ovid"]  
+                    if uri_validator(post_data["ovid"]) is False:
+                        chat_message["ImageURL"] = "https://media.gettr.com/" + post_data["ovid"]  
+                    else:
+                        chat_message["ImageURL"] = post_data["ovid"]                      
 
                 if list_item["action"] == "pub_pst":
                     chat_message["Timestamp"] = post_data["cdate"] / 1000  
@@ -170,7 +192,7 @@ class GettrDataObject:
                     chat_message["UniqueIDNetwork"] = list_item["activity"]["_id"]
                     chat_message["ChatParentID"] = post_id
                     chat_message["SenderUser"] =  self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][post_data["uid"]])  
-                    chat_message["ChatURL"] = f'https://www.gettr.com/post/{chat_message["UniqueIDNetwork"] }'
+                    chat_message["ChatURL"] = f'https://gettr.com/post/{chat_message["UniqueIDNetwork"] }'
                     return_list.append(chat_message)
 
                     # 2. add original post to list
@@ -179,7 +201,7 @@ class GettrDataObject:
                     chat_message_original["UniqueIDNetwork"] = post_id
                     chat_message_original["ChatParentID"] = "-1"
                     chat_message_original["SenderUser"] = self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][post_data["uid"]])  
-                    chat_message_original["ChatURL"] = f'https://www.gettr.com/post/{chat_message_original["UniqueIDNetwork"] }'
+                    chat_message_original["ChatURL"] = f'https://gettr.com/post/{chat_message_original["UniqueIDNetwork"] }'
                     
                     return_list.append(chat_message_original)
 
@@ -189,7 +211,7 @@ class GettrDataObject:
                     chat_message["UniqueIDNetwork"] = post_id
                     chat_message["ChatParentID"] = post_data["pid"]
                     chat_message["SenderUser"] =  self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][post_data["uid"]])  
-                    chat_message["ChatURL"] = f'https://www.gettr.com/comment/{chat_message["UniqueIDNetwork"] }'
+                    chat_message["ChatURL"] = f'https://gettr.com/comment/{chat_message["UniqueIDNetwork"] }'
                     return_list.append(chat_message)
 
                     # 2. add original post to list
@@ -209,7 +231,7 @@ class GettrDataObject:
                     chat_message_original["UniqueIDNetwork"] = post_data["pid"]
                     chat_message_original["ChatParentID"] = "-1"
                     chat_message_original["SenderUser"] = self.__uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][original_post["uid"]])  
-                    chat_message_original["ChatURL"] = f'https://www.gettr.com/post/{chat_message_original["UniqueIDNetwork"] }'
+                    chat_message_original["ChatURL"] = f'https://gettr.com/post/{chat_message_original["UniqueIDNetwork"] }'
                     
                     return_list.append(chat_message_original)                    
 

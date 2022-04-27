@@ -25,19 +25,21 @@ class ProfileCollector:
         pass
 
     def handle_current_profile(self):
+        debugPrint('[Profile] Handle profile')
+        snhwalker_utils.snh_browser.WaitMS(1000)
         current_url = snhwalker_utils.snh_browser.GetJavascriptString('window.location.href')
-        if not 'https://www.gettr.com/user/' in current_url:
+        if not 'gettr.com/user/' in current_url:
             debugPrint('[Profile] Current page isn\'t a user profile')
             return
 
         ProfileData = snhwalker_utils.snh_model_manager.CreateDictSNUserData()
  
         ProfileData['ProfileType'] = 0
-        ProfileData['UserIDNumber'] = snhwalker_utils.snh_browser.GetJavascriptString('document.querySelector("meta[property*=url]").getAttribute("content").replace("https://www.gettr.com/user/","")')
+        ProfileData['UserIDNumber'] = snhwalker_utils.snh_browser.GetJavascriptString('document.querySelectorAll(".MuiGrid-root .MuiAvatar-circular")[1].parentNode.href.replace("https://gettr.com/user/","")')
         ProfileData['UserID'] = ProfileData['UserIDNumber'] 
         ProfileData['UserURL'] = GetURL_Profile(ProfileData['UserID'], ProfileData['UserIDNumber'])
 
-        ProfileData['UserName'] = snhwalker_utils.snh_browser.GetJavascriptString('document.querySelector("meta[property*=title]").getAttribute("content").replace(" on GETTR","")')
+        ProfileData['UserName'] = snhwalker_utils.snh_browser.GetJavascriptString('document.querySelector("p[title]").getAttribute("title")')
         ProfileData['UserProfilePictureURL'] = snhwalker_utils.snh_browser.GetJavascriptString('document.querySelector("meta[property*=image]").getAttribute("content")')
         debugPrint("[Profile] Handle Profile", ProfileData)
         snhwalker.PromoteSNUserdata(ProfileData)        
@@ -57,7 +59,8 @@ class ProfileCollector:
 
     def save_profile(self, profileUrl):
         debugPrint('[START] Python Script: Save profile')
-        user_id = getRegex(profileUrl, 'https://www.gettr.com/user/(.*)', 1)
+        debugPrint(f'{profileUrl}')
+        user_id = getRegex(profileUrl, 'gettr.com/user/(.*)', 1)
         self.api.load_page(profileUrl)
         gettr_data_unif = self.api.get_unif(user_id)
 

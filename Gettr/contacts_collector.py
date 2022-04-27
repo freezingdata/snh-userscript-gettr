@@ -15,6 +15,7 @@ from Gettr.urls import *
 from Gettr.debug import *
 from Gettr.api import GattrAPI
 from Gettr.data_objects import GettrDataObject
+from Gettr.config import modul_config
 
 from snhwalker_utils import snhwalker, snh_major_version
 import snhwalker_utils    
@@ -47,9 +48,11 @@ class ContactsCollector:
     def __get_contacts(self):
         debugPrint(f'[Contacts] Save {self.contact_type}')
         if self.contact_type == 'FTFollower':
+            snhwalker.DropStatusMessage(f'Collect Follower')
             url = GetURL_Followers(self.profile["UserID"])    
             api_function = self.api.get_follower
         if self.contact_type == 'FTFriend':
+            snhwalker.DropStatusMessage(f'Collect Following')
             url = GetURL_Following(self.profile["UserID"])     
             api_function = self.api.get_followings           
         self.api.load_page(url)   
@@ -72,6 +75,12 @@ class ContactsCollector:
             offset += 20
             if has_next_page is False:
                 break
+
+            if (self.contact_type == 'FTFollower') and (modul_config["limit_follower"] is True) and (contact_count > modul_config["limit_follower_count"]):
+                break
+            if (self.contact_type == 'FTFriend') and (modul_config["limit_following"] is True) and (contact_count > modul_config["limit_following_count"]):
+                break            
+            
             snhwalker_utils.snh_browser.WaitMS(1000)
         
 

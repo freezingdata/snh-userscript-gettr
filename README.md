@@ -4,11 +4,13 @@ This repository contains a user module for the Social Network Harvester - https:
 # Functions
  - Detecting and collecting of GETTR profiles .
  - Collecting of GETTR timelines with media content.
+ - Collecting of GETTR timeline replies with media content
  - Collecting of follower and following
 
 # License
 
 Distributed under the GNU General Public License. See `LICENSE` for more information.
+Programs described/provided/linked in/to this Project are free software except otherwise stated. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
 
 
 # Imprint

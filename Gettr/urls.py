@@ -17,19 +17,19 @@ def GetURL_Profile(UserID, UserIDNumber = ''):
     return f'https://gettr.com/user/{UserID}'
 
 def GetURL_Friends(UserID, UserIDNumber = ''):
-    return f'https://www.gettr.com/user/{UserID}/following'
+    return f'https://gettr.com/user/{UserID}/following'
 
 def GetURL_Following(UserID, UserIDNumber = ''):
-    return f'https://www.gettr.com/user/{UserID}/following'
+    return f'https://gettr.com/user/{UserID}/following'
 
 def GetURL_Followers(UserID, UserIDNumber = ''):
-    return f'https://www.gettr.com/user/{UserID}/followers'        
+    return f'https://gettr.com/user/{UserID}/followers'        
 
 def GetURL_Fotos(UserID, UserIDNumber = ''):
-    return f'http://url.com/fotos/{UserID}'
+    return f'http://url.com/fotos/{UserID}' #Dummy
 
 def GetURL_Group(UserID, UserIDNumber = ''):
-    return f'http://url.com/group/{UserID}'
+    return f'http://url.com/group/{UserID}' #Dummy
 
 def GetURL_OwnProfile(UserID, UserIDNumber = ''):
-    return f'http://url.com/self'
+    return f'http://url.com/self' #Dummy

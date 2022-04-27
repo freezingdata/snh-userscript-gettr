@@ -4,6 +4,6 @@
     "owner": "Benno Krause",
     "testing_expert": "",
     "copyright": "Freezingdata GmbH",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "entrypoint": "entrypoint.py"
 }

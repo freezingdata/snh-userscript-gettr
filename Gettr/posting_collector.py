@@ -36,12 +36,13 @@ class PostingCollector:
         url = GetURL_Timeline(self.profile["UserID"])             
         self.api.load_page(url)   
 
-        # Load messages
+        # Load messages from "Posts" tab
         offset = 0            
         cursor = ''
         object_stringlist = []
         while True:
             debugPrint(f'[Posts] Request posting data (offset={offset})')
+            snhwalker.DropStatusMessage(f'Request posting data {offset}')
             gettr_data = self.api.get_posts(self.profile["UserID"], offset, 20, cursor)
             object_stringlist.append(gettr_data)
             debugWrite(f'Gettr_Posts_response_{str(time.time())}.data',gettr_data )
@@ -50,14 +51,16 @@ class PostingCollector:
             if cursor == '':
                 break
             snhwalker_utils.snh_browser.WaitMS(1000)
+
             
 
-        # Load answers
+        # Load answers from "Replies" tab
         if self.config["SaveComments"] is True:
             offset = 0            
             cursor = ''
             while True:
                 debugPrint(f'[Posts] Request comment data (offset={offset})')
+                snhwalker.DropStatusMessage(f'Request answer data {offset}')
                 gettr_data = self.api.get_answers(self.profile["UserID"], offset, 20, cursor)
                 object_stringlist.append(gettr_data)
                 debugWrite(f'Gettr_Comments_response_{str(time.time())}.data',gettr_data )
@@ -70,6 +73,7 @@ class PostingCollector:
 
         # convert gettr messages to snh data objects
         chatmessage_list = []
+        snhwalker.DropStatusMessage(f'Converting messages')
         for data_string in object_stringlist:
             chatmessage_list += GettrDataObject(data_string).as_SNChatmessage_list()
 

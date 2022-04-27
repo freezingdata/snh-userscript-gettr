@@ -64,7 +64,7 @@ def GetScreenshotSizes():
 def getPluginInfo():
     pluginInfo = {}
     pluginInfo['name'] = 'SNH user script - Gettr '
-    pluginInfo['url'] = 'https://www.gettr.com/'
+    pluginInfo['url'] = 'https://gettr.com/'
     pluginInfo['copyright'] = 'Freezingdata GmbH'
     pluginInfo['functions'] = {}
     pluginInfo['functions']['profile'] = True
@@ -110,7 +110,6 @@ def CurrentWebPageIsGroup():
     return ProfileCollector().current_is_group()
 
 def HandleProfile():
-    debugConfig["enableDebugFileOutput"] = True
     ProfileCollector().handle_current_profile()
 
 def HandleGroupsPage():

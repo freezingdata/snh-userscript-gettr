@@ -38,24 +38,25 @@ class GattrAPI:
             debugPrint(f'[API]  Capture failed')    
             return
         
-        sample_api_call = api_calls[0]
-        debugPrint(f'[API]  Sample API Call -> {sample_api_call["url"]}')
-        
-        if not 'x-app-auth' in  sample_api_call["request_header"]:
-            debugPrint(f'[API]  "x-app-auth" missing in captured request header')
-            return
-        self.x_app_auth = sample_api_call["request_header"]["x-app-auth"]
+        for sample_api_call in  api_calls:
+            debugPrint(f'[API]  Sample API Call -> {sample_api_call["url"]}')
+            
+            if not 'x-app-auth' in  sample_api_call["request_header"]:
+                debugPrint(f'[API]  "x-app-auth" missing in captured request header')
+                continue
+            self.x_app_auth = sample_api_call["request_header"]["x-app-auth"]
 
-        if not 'ver' in  sample_api_call["request_header"]:
-            debugPrint(f'[API]  "ver" missing in captured request header')
-            return
-        self.version = sample_api_call["request_header"]["ver"]
+            if not 'ver' in  sample_api_call["request_header"]:
+                debugPrint(f'[API]  "ver" missing in captured request header')
+                continue
+            self.version = sample_api_call["request_header"]["ver"]
 
 
-        if not 'User-Agent' in  sample_api_call["request_header"]:
-            debugPrint(f'[API]  "User-Agent" missing in captured request header')
-            return
-        self.useragent = sample_api_call["request_header"]["User-Agent"]        
+            if not 'User-Agent' in  sample_api_call["request_header"]:
+                debugPrint(f'[API]  "User-Agent" missing in captured request header')
+                continue
+            self.useragent = sample_api_call["request_header"]["User-Agent"]      
+            break  
 
         debugPrint(f'[API]  x_app_auth -> {self.x_app_auth}')
         debugPrint(f'[API]  ver -> {self.version}')
@@ -63,6 +64,7 @@ class GattrAPI:
 
 
     def get_unif(self, user_id):
+        debugPrint(user_id)
         response_data = self.__get_request(f'https://api.gettr.com/s/uinf/{user_id}')
         debugPrint(f'[API] Response unif -> {response_data[0:100]}')
         return response_data

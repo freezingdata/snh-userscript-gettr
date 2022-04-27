@@ -15,7 +15,7 @@ import os
 
 debugConfig = {
     "enableDebugFileOutput"       : False,
-    "enableDebugLog"              : False,
+    "enableDebugLog"              : True,
     "debugFolderLocation"         : "c:\\SNH-Temp\\Gettr\\",
     "debugLevelThreshold"         : 0  
 }
