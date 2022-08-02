@@ -13,9 +13,11 @@ import time
 
 import snhwalker_utils
 from Gettr.debug import *
+from Gettr.posting_collector import PostingCollector
+from data_objects import GettrDataObject
 
 
-class PostingCollector:
+class OnePostingCollector:
     def __init__(self, url: str, config: dict):
         self.url: str = url
         self.config: dict = config
@@ -29,23 +31,21 @@ class PostingCollector:
         post_data: list = self.capture_data()
         self.prepare_post_data_to_snh(post_data)
 
-
-        #return captured_page_data
-
     def capture_data(self) -> list:
         debugPrint(f"[INFO]: Start resource capture. Url: {self.url}")
-        CAPTURE_FILTER: str = "https://api.gettr.com/u/post"
+        CAPTURE_FILTER: str = "api.gettr.com/u/post"
         snhwalker_utils.snh_browser.StartResourceCapture(CAPTURE_FILTER, "")
         snhwalker_utils.snh_browser.LoadPage(self.url)
         snhwalker_utils.snh_browser.WaitMS(3000)
 
         post_data = snhwalker_utils.snh_browser.FlushResourceCapture()
         break_count = 0
-        while post_data == "":
-            snhwalker_utils.snh_browser.WaitMS(1000)
+
+        while not post_data:
+            snhwalker_utils.snh_browser.WaitMS(3000)
             break_count += 1
             post_data = snhwalker_utils.snh_browser.FlushResourceCapture()
-            if break_count == 6:
+            if break_count == 5:
                 debugPrint("[ERROR]: Bad resource capture. Check capture filter.")
                 break
 
@@ -54,5 +54,21 @@ class PostingCollector:
         return post_data
 
     def prepare_post_data_to_snh(self, post_data):
-        print(post_data)
+        # We use here the existing implementation of data collection. (GettrDataObject)
+        data_fresh = post_data[0].get("response_body")
+        data = json.loads(data_fresh)
 
+        unif_data: dict = data["result"]["aux"]["uinf"]
+        key = list(unif_data.keys())[0]
+        path: dict = data["result"]["aux"]["uinf"][key]
+
+        gettr = GettrDataObject(data_fresh)
+        snh_user_data = gettr.uinf_to_snuserdata(path)
+        snh_posting_data = gettr.get_chat_messages(data, messages_structure=False)[0]
+        snh_posting_data["SenderUser"] = snh_user_data
+        snhwalker_utils.snhwalker.PromoteSNChatmessage(snh_posting_data)
+
+        if self.config["SaveComments"] is True:
+            posting_collector = PostingCollector(snh_user_data, None)
+            comments: list = posting_collector.load_comments()
+            posting_collector.convert_and_promote_comments(comments)

@@ -12,6 +12,7 @@
 
 # Updated to new structure on 2021-09-21 10:11:56
 import snhwalker_utils
+from one_posting_collector import OnePostingCollector
 from snhwalker_utils import snhwalker
 
 
@@ -47,7 +48,8 @@ def snh_Save(taskItem):
     if taskItem["TargetType"] == "Profile":
         ProfileCollector().save_profile(taskItem["TargetURL"])
     elif taskItem["TargetType"] == "Timeline":
-        PostingCollector(taskItem["Targetprofile"], taskItem["Config"]).run()
+        OnePostingCollector(taskItem["TargetURL"], taskItem["Config"]).run()
+        #PostingCollector(taskItem["Targetprofile"], taskItem["Config"]).run()
     elif taskItem["TargetType"] == "ProfileDetails":
         ProfileCollector().save_profile_details(taskItem["Targetprofile"])
     elif taskItem["TargetType"] == "Media":
