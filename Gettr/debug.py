@@ -46,3 +46,6 @@ def debugWrite(filepath, content):
         contentfile.close()
         debugPrint("Write Debug File in " + debugConfig["debugFolderLocation"] + filepath)
 
+def manual_enable_debug_log():
+    global debugConfig
+    debugConfig["enableDebugLog"] = True
