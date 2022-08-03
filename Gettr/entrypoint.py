@@ -43,7 +43,6 @@ def snh_Save(taskItem):
     print('[START] snh_Save ' + taskItem["TargetType"])
     initDebug(taskItem)
     debugConfig["enableDebugFileOutput"] = True
-    print(taskItem)
     if taskItem["TargetType"] == "Profile":
         ProfileCollector().save_profile(taskItem["TargetURL"])
     elif taskItem["TargetType"] == "Timeline":
@@ -74,6 +73,7 @@ def getPluginInfo():
     pluginInfo['functions']['groups'] = False
     pluginInfo['functions']['details'] = True
     pluginInfo['functions']['stories'] = False
+    pluginInfo['functions']['post'] = True
     pluginInfo['functions']['videos'] = True
     pluginInfo['functions']['friends'] = True
     pluginInfo['functions']['follower'] = True
