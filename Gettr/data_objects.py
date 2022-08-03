@@ -80,6 +80,11 @@ class GettrDataObject:
                 return self.data["result"]["aux"]["cursor"]         
         return ''        
 
+    def get_next_comment_cursor(self):
+        if not (self.data["result"]["aux"]["cursor"] == 0):
+            return self.data["result"]["aux"]["cursor"]
+        return ''
+
     def as_userlist(self):
         return_list = []
         if self.is_rslst() is True:
@@ -142,16 +147,14 @@ class GettrDataObject:
             return_list.append(DetailWeb)       
         return return_list              
 
-    def as_SNChatmessage_list(self):
+    def as_SNChatmessage_list(self, messages_structure=True):
         return_list = []
         try:
-            if self.is_pstfd() is False:
+            if self.is_pstfd() is False and messages_structure:
                 return []
-
-            for list_item in self.data["result"]["data"]["list"]:            
-                result = self.get_chat_messages(list_item)
+            for list_item in self.data["result"]["data"]["list"]:
+                result = self.get_chat_messages(list_item, messages_structure)
                 return_list.append(result)
-
             flat_return_list = [item for sublist in return_list for item in sublist]
             return flat_return_list
 
@@ -164,15 +167,18 @@ class GettrDataObject:
     def get_chat_messages(self, list_item, messages_structure=True):
         return_list = []
         chat_message = snhwalker_utils.snh_model_manager.CreateDictSNChatmessage()
-
         if messages_structure:
             post_id = list_item["activity"]["pstid"]
             post_data = self.data["result"]["aux"]["post"][post_id]
         else:
-            post_id = list_item["result"]["data"]["_id"]
-            post_data = list_item["result"]["data"]
-            list_item["action"] = "pub_pst"
-
+            try:
+                post_id = list_item["result"]["data"]["_id"]
+                post_data = list_item["result"]["data"]
+                list_item["action"] = "pub_pst"
+            except KeyError:
+                post_id = list_item["_id"]
+                post_data = list_item
+                list_item["action"] = "pub_cm"
 
         if "txt" in post_data:
             chat_message["Text"] = post_data["txt"]
@@ -232,32 +238,44 @@ class GettrDataObject:
 
         elif list_item.get("action") == "pub_cm":
             # 1. add comment post to list
-            chat_message["Timestamp"] = list_item["activity"]["cdate"] / 1000
+            chat_message["Timestamp"] = list_item.get("cdate", 0) / 1000
+            if not chat_message["Timestamp"]:
+                chat_message["Timestamp"] = list_item.get("activity", {}).get("cdate", 0) / 1000
+
             chat_message["UniqueIDNetwork"] = post_id
-            chat_message["ChatParentID"] = post_data["pid"]
+            chat_message["ChatParentID"] = post_data.get("pid")
+            if not chat_message["ChatParentID"]:
+                chat_message["ChatParentID"] = post_data.get("_id")
+
             chat_message["SenderUser"] = self.uinf_to_snuserdata(self.data["result"]["aux"]["uinf"][post_data["uid"]])
             chat_message["ChatURL"] = f'https://gettr.com/comment/{chat_message["UniqueIDNetwork"]}'
             return_list.append(chat_message)
 
             # 2. add original post to list
-            original_post = self.data["result"]["aux"]["post"][post_data["pid"]]
-            chat_message_original = snhwalker_utils.snh_model_manager.CreateDictSNChatmessage()
-            if "txt" in original_post:
-                chat_message_original["Text"] = original_post["txt"]
-            if "prevsrc" in original_post:
-                chat_message_original["LinkURL"] = original_post["prevsrc"]
-            if ('img' in original_post) and (len(original_post["img"]) > 0):
-                chat_message_original["ImageURL"] = "https://media.gettr.com/" + original_post["img"][0]
-            if ('previmg' in original_post):
-                chat_message_original["ImageURL"] = "https://media.gettr.com/" + original_post["previmg"]
-            if ('ovid' in original_post):
-                chat_message_original["VideoURL"] = "https://media.gettr.com/" + original_post["ovid"]
-            chat_message_original["Timestamp"] = original_post["cdate"] / 1000
-            chat_message_original["UniqueIDNetwork"] = post_data["pid"]
-            chat_message_original["ChatParentID"] = "-1"
-            chat_message_original["SenderUser"] = self.uinf_to_snuserdata(
-                self.data["result"]["aux"]["uinf"][original_post["uid"]])
-            chat_message_original["ChatURL"] = f'https://gettr.com/post/{chat_message_original["UniqueIDNetwork"]}'
+            try:
+                original_post = self.data["result"]["aux"]["post"][post_data["pid"]]
+            except KeyError:
+                original_post = None
 
-            return_list.append(chat_message_original)
+            if original_post:
+                chat_message_original = snhwalker_utils.snh_model_manager.CreateDictSNChatmessage()
+                if "txt" in original_post:
+                    chat_message_original["Text"] = original_post["txt"]
+                if "prevsrc" in original_post:
+                    chat_message_original["LinkURL"] = original_post["prevsrc"]
+                if ('img' in original_post) and (len(original_post["img"]) > 0):
+                    chat_message_original["ImageURL"] = "https://media.gettr.com/" + original_post["img"][0]
+                if ('previmg' in original_post):
+                    chat_message_original["ImageURL"] = "https://media.gettr.com/" + original_post["previmg"]
+                if ('ovid' in original_post):
+                    chat_message_original["VideoURL"] = "https://media.gettr.com/" + original_post["ovid"]
+                chat_message_original["Timestamp"] = original_post["cdate"] / 1000
+                chat_message_original["UniqueIDNetwork"] = post_data["pid"]
+                chat_message_original["ChatParentID"] = "-1"
+                chat_message_original["SenderUser"] = self.uinf_to_snuserdata(
+                    self.data["result"]["aux"]["uinf"][original_post["uid"]])
+                chat_message_original["ChatURL"] = f'https://gettr.com/post/{chat_message_original["UniqueIDNetwork"]}'
+
+                return_list.append(chat_message_original)
+
         return return_list
