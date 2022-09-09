@@ -9,11 +9,10 @@
 @Desc    :   None
 '''
 
-
 # Updated to new structure on 2021-09-21 10:11:56
 import snhwalker_utils
+from one_posting_collector import OnePostingCollector
 from snhwalker_utils import snhwalker
-
 
 from Gettr.module_tools import *
 from Gettr.urls import *
@@ -23,7 +22,6 @@ from Gettr.contacts_collector import ContactsCollector
 from Gettr.handler_account import AccountHandling
 from Gettr.media_collector import MediaCollector
 from Gettr.posting_collector import PostingCollector
-
 
 
 def snh_GetUrl(profile, urlType):
@@ -40,27 +38,31 @@ def snh_GetUrl(profile, urlType):
         result = GetURL_Group(profile["UserID"], profile["UserIDNumber"])
     return result
 
+
 def snh_Save(taskItem):
     print('[START] snh_Save ' + taskItem["TargetType"])
-    initDebug(taskItem) 
-    debugConfig["enableDebugFileOutput"] = True   
+    initDebug(taskItem)
+    debugConfig["enableDebugFileOutput"] = True
     if taskItem["TargetType"] == "Profile":
         ProfileCollector().save_profile(taskItem["TargetURL"])
     elif taskItem["TargetType"] == "Timeline":
         PostingCollector(taskItem["Targetprofile"], taskItem["Config"]).run()
+    elif taskItem["TargetType"] == "Post":
+        OnePostingCollector(taskItem["TargetURL"], taskItem["Config"]).run()
     elif taskItem["TargetType"] == "ProfileDetails":
         ProfileCollector().save_profile_details(taskItem["Targetprofile"])
     elif taskItem["TargetType"] == "Media":
-        MediaCollector(taskItem["Targetprofile"], taskItem["Config"]).run()        
+        MediaCollector(taskItem["Targetprofile"], taskItem["Config"]).run()
     elif taskItem["TargetType"] == "Friends":
         ContactsCollector(taskItem["Targetprofile"], taskItem["Config"]).run()
 
 
 def GetScreenshotSizes():
-    return  {'areaPositionX': 0,
-              'areaPositionY': 0,
-              'areaSizeX': 1050}
- 
+    return {'areaPositionX': 0,
+            'areaPositionY': 0,
+            'areaSizeX': 1050}
+
+
 def getPluginInfo():
     pluginInfo = {}
     pluginInfo['name'] = 'SNH user script - Gettr '
@@ -71,6 +73,7 @@ def getPluginInfo():
     pluginInfo['functions']['groups'] = False
     pluginInfo['functions']['details'] = True
     pluginInfo['functions']['stories'] = False
+    pluginInfo['functions']['post'] = True
     pluginInfo['functions']['videos'] = True
     pluginInfo['functions']['friends'] = True
     pluginInfo['functions']['follower'] = True
@@ -82,39 +85,65 @@ def getPluginInfo():
     pluginInfo['functions']['mediacomments'] = False
     return pluginInfo
 
+
 def DisableUseraccountData():
     AccountHandling().disable_account()
-       
+
+
 def EnableUseraccountData():
     AccountHandling().enable_account()
+
 
 def GetProfileStatus():
     # Not used in Userscripts
     return True
 
+
 def GetLoginStatus():
     # Not used in Userscripts
     return True
+
 
 def doLogin(userid, password):
     # Not used in Userscripts
     return True
 
+
 def CurrentWebPageIsUser():
     return ProfileCollector().current_is_user()
+
 
 def CurrentWebPageIsPage():
     return ProfileCollector().current_is_page()
 
+
 def CurrentWebPageIsGroup():
     return ProfileCollector().current_is_group()
 
+
 def HandleProfile():
     ProfileCollector().handle_current_profile()
+
 
 def HandleGroupsPage():
     ProfileCollector().handle_current_group()
     pass
 
 
+def HandlePosting():
+    OnePostingCollector.handle_post()
 
+
+def HandlePage() -> None:
+    manual_enable_debug_log()
+    url = snhwalker_utils.snh_browser.GetJavascriptString("window.location.href")
+    gettr_url_resolver = GettrUrlResolver(url)
+    page_type = gettr_url_resolver.get_page_type()
+
+    if page_type == GETTR_POST_PAGE or page_type == GETTR_COMMENT_PAGE:
+        HandlePosting()
+    elif page_type == GETTR_PROFILE_PAGE:
+        HandleProfile()
+    else:
+        debugPrint(f"\nError with handle page\n")
+        print(f"\nError with handle page\n")

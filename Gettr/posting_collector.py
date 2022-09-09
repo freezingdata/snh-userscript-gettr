@@ -52,25 +52,32 @@ class PostingCollector:
                 break
             snhwalker_utils.snh_browser.WaitMS(1000)
 
-            
-
         # Load answers from "Replies" tab
         if self.config["SaveComments"] is True:
-            offset = 0            
-            cursor = ''
-            while True:
-                debugPrint(f'[Posts] Request comment data (offset={offset})')
-                snhwalker.DropStatusMessage(f'Request answer data {offset}')
-                gettr_data = self.api.get_answers(self.profile["UserID"], offset, 20, cursor)
-                object_stringlist.append(gettr_data)
-                debugWrite(f'Gettr_Comments_response_{str(time.time())}.data',gettr_data )
-                cursor = GettrDataObject(gettr_data).get_pstfd_cursor() 
-                offset += 20
-                if cursor == '':
-                    break
-                snhwalker_utils.snh_browser.WaitMS(1000)
-                            
+            comments: list = self.load_comments()
+            object_stringlist: list = object_stringlist + comments
 
+        self.convert_and_promote_comments(object_stringlist)
+
+    def load_comments(self) -> list:
+        object_stringlist = []
+        offset = 0
+        cursor = ''
+        while True:
+            debugPrint(f'[Posts] Request comment data (offset={offset})')
+            snhwalker.DropStatusMessage(f'Request answer data {offset}')
+            gettr_data = self.api.get_answers(self.profile["UserID"], offset, 20, cursor)
+            object_stringlist.append(gettr_data)
+            debugWrite(f'Gettr_Comments_response_{str(time.time())}.data', gettr_data)
+            cursor = GettrDataObject(gettr_data).get_pstfd_cursor()
+            offset += 20
+            if cursor == '':
+                break
+            snhwalker_utils.snh_browser.WaitMS(1000)
+        return object_stringlist
+
+    @staticmethod
+    def convert_and_promote_comments(object_stringlist) -> None:
         # convert gettr messages to snh data objects
         chatmessage_list = []
         snhwalker.DropStatusMessage(f'Converting messages')
@@ -84,3 +91,20 @@ class PostingCollector:
             post_count += 1
             debugPrint(f'[Posts] Handling posting  {post_count}/{max_count} -> {chat_item}')
             snhwalker.PromoteSNChatmessage(chat_item)
+
+    def load_comments_from_current_posting(self, post_id) -> list:
+        object_stringlist = []
+        offset = 0
+        cursor = ''
+        while True:
+            debugPrint(f'[Posts] Request comment data (offset={offset})')
+            snhwalker.DropStatusMessage(f'Request answer data {offset}')
+            gettr_data = self.api.get_comments(post_id, offset, 20, cursor)
+            object_stringlist.append(gettr_data)
+            debugWrite(f'Gettr_Comments_response_{str(time.time())}.data', gettr_data)
+            cursor = GettrDataObject(gettr_data).get_next_comment_cursor()
+            offset += 20
+            if cursor == '':
+                break
+            snhwalker_utils.snh_browser.WaitMS(1000)
+        return object_stringlist

@@ -87,7 +87,15 @@ class GattrAPI:
     def get_answers(self, user_id, offset, max, cursor = ''):
         response_data = self.__get_request(f'https://api.gettr.com/u/user/{user_id}/posts/?offset={offset}&dir=fwd&max={max}&incl=posts|stats|userinfo|shared|liked&fp=f_uc&cursor={cursor}')
         debugPrint(f'[API] Response answers -> {response_data[0:100]}')
-        return response_data                
+        return response_data
+
+    def get_comments(self, post_id, offset, max, cursor = ''):
+        if not cursor:
+            response_data = self.__get_request(f'https://api.gettr.com/u/post/{post_id}/comments?offset={offset}&max={max}&dir=rev&incl=posts%7Cstats%7Cuserinfo%7Cshared%7Cliked')
+        else:
+            response_data = self.__get_request(f'https://api.gettr.com/u/post/{post_id}/comments?offset={offset}&max={max}&dir=rev&incl=posts%7Cstats%7Cuserinfo%7Cshared%7Cliked&cursor={cursor}')
+        debugPrint(f'[API] Response answers -> {response_data[0:100]}')
+        return response_data
 
     def __get_request(self, requesturl):
         debugPrint(f'[API] Request: {requesturl}')
